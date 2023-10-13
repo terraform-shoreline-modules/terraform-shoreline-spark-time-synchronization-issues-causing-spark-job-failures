@@ -1,0 +1,138 @@
+{
+  "name": "time_synchronization_issues_causing_spark_job_failures",
+  "description": "This incident type refers to issues encountered in a Spark cluster where Spark jobs are failing due to time synchronization problems between the nodes in the cluster. These synchronization issues can cause data inconsistencies and errors in Spark applications, which can lead to job failures. To resolve this issue, it is necessary to ensure that all nodes in the cluster have synchronized time.",
+  "params": [
+    {
+      "name": "NTP_SERVER",
+      "value": ""
+    },
+    {
+      "name": "NTP_PORT",
+      "value": ""
+    },
+    {
+      "name": "LIST_OF_CLUSTER_NODES",
+      "value": ""
+    },
+    {
+      "name": "NTP_SERVER_ADDRESS",
+      "value": ""
+    },
+    {
+      "name": "HOST_NAME",
+      "value": ""
+    },
+    {
+      "name": "K8S_CLUSTER_NAME",
+      "value": ""
+    },
+    {
+      "name": "NAMESPACE",
+      "value": ""
+    }
+  ],
+  "cells": [
+    {
+      "name": "cell_1",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Time synchronization issues causing Spark job failures.\nThis incident type refers to issues encountered in a Spark cluster where Spark jobs are failing due to time synchronization problems between the nodes in the cluster. These synchronization issues can cause data inconsistencies and errors in Spark applications, which can lead to job failures. To resolve this issue, it is necessary to ensure that all nodes in the cluster have synchronized time."
+    },
+    {
+      "name": "cell_2",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the time on each node in the Spark cluster"
+    },
+    {
+      "name": "cell_3",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `for node in ${LIST_OF_CLUSTER_NODES}; do ssh $node date; done`"
+    },
+    {
+      "name": "cell_4",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the time synchronization status of each node in the cluster"
+    },
+    {
+      "name": "cell_5",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `for node in ${LIST_OF_CLUSTER_NODES}; do ssh $node timedatectl status; done`"
+    },
+    {
+      "name": "cell_6",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the NTP daemon status on each node in the cluster"
+    },
+    {
+      "name": "cell_7",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `for node in ${LIST_OF_CLUSTER_NODES}; do ssh $node systemctl status ntpd; done`"
+    },
+    {
+      "name": "cell_8",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the NTP daemon configuration on each node in the cluster"
+    },
+    {
+      "name": "cell_9",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `for node in ${LIST_OF_CLUSTER_NODES}; do ssh $node cat /etc/ntp.conf; done`"
+    },
+    {
+      "name": "cell_10",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Restart the NTP daemon on each node in the cluster"
+    },
+    {
+      "name": "cell_11",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `for node in ${LIST_OF_CLUSTER_NODES}; do ssh $node systemctl restart ntpd; done`"
+    },
+    {
+      "name": "cell_12",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the time synchronization status again after restarting the NTP daemon"
+    },
+    {
+      "name": "cell_13",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `for node in ${LIST_OF_CLUSTER_NODES}; do ssh $node timedatectl status; done`"
+    },
+    {
+      "name": "cell_14",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Incorrect NTP (Network Time Protocol) server configuration on one or more nodes in the cluster."
+    },
+    {
+      "name": "cell_15",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "host | host_name=$HOST_NAME | invoke_ntp_check($NTP_SERVER, $NTP_PORT)"
+    },
+    {
+      "name": "cell_16",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Configure NTP (Network Time Protocol) on all nodes in the Spark cluster to ensure that time synchronization is consistent across all nodes."
+    },
+    {
+      "name": "cell_17",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "host | host_name=$HOST_NAME | invoke_configure_ntp($NTP_SERVER, $NTP_SERVER_ADDRESS)"
+    }
+  ]
+}
