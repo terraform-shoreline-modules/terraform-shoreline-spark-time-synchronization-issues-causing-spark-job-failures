@@ -28,7 +28,7 @@ resource "shoreline_action" "invoke_ntp_check" {
   name        = "invoke_ntp_check"
   description = "Incorrect NTP (Network Time Protocol) server configuration on one or more nodes in the cluster."
   command     = "`chmod +x /tmp/ntp_check.sh && /tmp/ntp_check.sh`"
-  params      = ["NTP_SERVER","NTP_PORT"]
+  params      = ["NTP_PORT","NTP_SERVER"]
   file_deps   = ["ntp_check"]
   enabled     = true
   depends_on  = [shoreline_file.ntp_check]

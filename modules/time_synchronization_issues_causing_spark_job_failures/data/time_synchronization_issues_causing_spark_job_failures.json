@@ -3,19 +3,19 @@
   "description": "This incident type refers to issues encountered in a Spark cluster where Spark jobs are failing due to time synchronization problems between the nodes in the cluster. These synchronization issues can cause data inconsistencies and errors in Spark applications, which can lead to job failures. To resolve this issue, it is necessary to ensure that all nodes in the cluster have synchronized time.",
   "params": [
     {
-      "name": "NTP_SERVER",
-      "value": ""
-    },
-    {
       "name": "NTP_PORT",
       "value": ""
     },
     {
-      "name": "LIST_OF_CLUSTER_NODES",
+      "name": "NTP_SERVER",
       "value": ""
     },
     {
       "name": "NTP_SERVER_ADDRESS",
+      "value": ""
+    },
+    {
+      "name": "LIST_OF_CLUSTER_NODES",
       "value": ""
     },
     {
@@ -120,7 +120,7 @@
       "name": "cell_15",
       "type": "OP_LANG",
       "enabled": true,
-      "content": "host | host_name=$HOST_NAME | invoke_ntp_check($NTP_SERVER, $NTP_PORT)"
+      "content": "host | host_name=$HOST_NAME | invoke_ntp_check($NTP_PORT, $NTP_SERVER)"
     },
     {
       "name": "cell_16",
